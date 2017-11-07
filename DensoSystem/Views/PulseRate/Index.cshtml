@@ -1,0 +1,72 @@
+﻿@model DensoSystem.Models.AnalyseViewModel
+@{
+    ViewBag.Title = "PulseRate";
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger" role="alert">@TempData["Error"]</div>
+}
+
+@using (Ajax.BeginForm("Generate", "Analyse", new AjaxOptions
+{
+    OnBegin = "ClearCharts",
+    UpdateTargetId = "ChartResult",
+    OnSuccess = "CheckSizeWindow"
+
+}, new { @class = "form-horizontal" }))
+{
+    <div id="filter" class="form-group">
+        <label for="SelectDate" class="col-sm-2 control-label text-right">DateTime</label>
+        <div class="col-sm-3">
+            @Html.TextBoxFor(model => model.SelectDate,
+           new { @class = "form-control", @type = "date", @Value = Model.SelectDate.ToString("yyyy-MM-dd") })
+        </div>
+        <label for="Year" class="col-sm-2 control-label text-right">Chart Type</label>
+        <div class="col-sm-3">
+            @Html.EnumDropDownListFor(m => m.Chart, new { @class = "form-control" })
+        </div>
+        <div class="col-sm-2">
+            <button type="submit" class="btn btn-default">Submit</button>
+        </div>
+    </div>
+}
+<div id="ChartResult">nothing happend</div>
+
+@section HeadSection
+{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/highcharts.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/highcharts-more.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/Scripts/dark-unica.js")"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".datefield").datepicker();
+            CheckSizeWindow();
+        });
+
+        window.onresize = function (event) {
+            CheckSizeWindow();
+        };
+
+        function ClearCharts() {
+            while (Highcharts.charts && Highcharts.charts.length > 0) {
+                if (Highcharts.charts[0] !== undefined) {
+                    Highcharts.charts[0].destroy();
+                }
+                Highcharts.charts.shift();
+            }
+        }
+
+        function CheckSizeWindow() {
+            var width = window.outerWidth;
+            var height = window.outerHeight;
+            var chartContainer = document.getElementById('chart-container');
+            var filterGroup = document.getElementById('filter');
+            if (chartContainer != null) {
+                filterGroup.style.display = width > height ? 'none' : 'block';
+            }
+        }
+
+    </script>
+}
+
