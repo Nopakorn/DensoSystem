@@ -34,6 +34,8 @@ namespace DensoSystem.Controllers
                 var dateMonth = data.SelectDate.Date.AddMonths(1);
                 var dateStart = data.SelectDate.Date;
                 var model = new List<PulseRateViewModel>();
+                var rangeDates = DateRange(dateStart, dateWeek);
+
                 switch (data.Chart)
                 {
                     case ChartType.DayAnalyse:
@@ -51,6 +53,8 @@ namespace DensoSystem.Controllers
                                    Date = s.CreateDate.Value,
                                    PulseRate = s.PulseRate
                                }).OrderBy(c => c.Date).ToList();
+
+
                         return model;
                     case ChartType.MonthAnalyse:
                         model = ctx.Analyses.Where(x => DbFunctions.TruncateTime(x.CreateDate) >= dateStart && DbFunctions.TruncateTime(x.CreateDate) <= dateMonth)
@@ -64,6 +68,12 @@ namespace DensoSystem.Controllers
                         return null;
                 }
             }
+        }
+
+        public IEnumerable<DateTime> DateRange(DateTime fromDate, DateTime toDate)
+        {
+            return Enumerable.Range(0, toDate.Subtract(fromDate).Days + 1)
+                             .Select(d => fromDate.AddDays(d));
         }
     }
 }
